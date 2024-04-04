@@ -5,9 +5,12 @@ import com.example.creswave.springjwt.models.Comment;
 import com.example.creswave.springjwt.repository.BlogRepository;
 import com.example.creswave.springjwt.repository.CommentRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import java.util.*;
 
 @Service
 @AllArgsConstructor
@@ -23,8 +26,26 @@ public class CommentService {
         return commentRepository.save(comment);
     }
 
-    public List<Comment> viewComment(Long blogId){
-        return commentRepository.findByBlogId(blogId);
+    public Optional<Comment> viewComment(Long commentId){
+        return commentRepository.findById(commentId);
+    }
+
+    public Map<String, Object> viewComment(Long blogId,int page, int size){
+        Map<String, Object> response = new HashMap<>();
+
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Comment> commentPage = commentRepository.findByBlogId(blogId,pageable);
+        List<Comment> comments = new ArrayList<>(commentPage.getContent());
+
+        // Sort comments in descending order by ID
+        Collections.sort(comments, Comparator.comparingLong(Comment::getId).reversed());
+
+        response.put("comments", comments);
+        response.put("currentPage", commentPage.getNumber());
+        response.put("totalItems", commentPage.getTotalElements());
+        response.put("totalPages", commentPage.getTotalPages());
+
+        return response;
     }
 
     public Comment updateComment(Long commentId, Comment comment){

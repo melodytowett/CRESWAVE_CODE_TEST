@@ -8,7 +8,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
@@ -23,12 +24,17 @@ public class CommentController {
         return new ResponseEntity<>(commentService.addComment(comment, blogId), HttpStatus.CREATED);
     }
 
-    @GetMapping("/view/{blogId}")
+    @GetMapping("/view/{commentId}")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    public List<Comment> viewComment(@PathVariable Long blogId){
-        return commentService.viewComment(blogId);
+    public Optional<Comment> viewComment(@PathVariable Long commentId){
+        return commentService.viewComment(commentId);
     }
 
+    @GetMapping("/get-all/{blogId}")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    public Map<String,Object> viewAllCommentsForABlog(@PathVariable Long blogId,@RequestParam int page,@RequestParam int size){
+        return commentService.viewComment(blogId, page, size);
+    }
     @PutMapping("/update/{commentId}")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<Comment> updateComment(@RequestBody Comment comment,@PathVariable Long commentId){

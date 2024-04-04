@@ -1,6 +1,7 @@
 package com.example.creswave.springjwt.services;
 
 import com.example.creswave.springjwt.models.Blog;
+import com.example.creswave.springjwt.models.Comment;
 import com.example.creswave.springjwt.repository.BlogRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -9,10 +10,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 @AllArgsConstructor
@@ -31,7 +29,9 @@ public class BlogService {
         Pageable pageable = PageRequest.of(page, size);
         Page<Blog> blogPage = blogRepository.findAll(pageable);
 
-        List<Blog> blogs = blogPage.getContent();
+        List<Blog> blogs = new ArrayList<>(blogPage.getContent());
+
+        blogs.sort(Comparator.comparingLong(Blog::getId).reversed());
 
         response.put("blogs", blogs);
         response.put("currentPage", blogPage.getNumber());
@@ -39,6 +39,10 @@ public class BlogService {
         response.put("totalPages", blogPage.getTotalPages());
 
         return response;
+    }
+
+    public List<Blog> searchByTitleAndDescription(String searchTerm) {
+        return blogRepository.findByTitleContainingIgnoreCaseOrDescriptionContainingIgnoreCase(searchTerm, searchTerm);
     }
 
     public Blog updateBlog(Long blogId, Blog blog){

@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
@@ -26,6 +27,11 @@ public class BlogController {
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public Map<String, Object> readBlogs(@RequestParam ("page")int page, @RequestParam("size")int size){
         return blogService.viewBlogs(page, size);
+    }
+    @GetMapping("/search")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    public List<Blog> searchByTitleAndDescription(@RequestParam String searchTerm){
+        return blogService.searchByTitleAndDescription(searchTerm);
     }
     @PutMapping("/updating/{blogId}")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
