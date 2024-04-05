@@ -21,14 +21,22 @@
 1. *Saving a user*:
 
 *POST*: localhost:8080/api/auth/signup
-
+* to signup as admin indicate role as admin
 {
-"username":"melo",
-"email":"melo@gmail.com",
+"username":"admin",
+"email":"admin@gmail.com",
 "password":"12345678",
 "role":["admin"]
 }
 
+* to signup as user indicate role as user
+* {
+  "username":"user",
+  "email":"user@gmail.com",
+  "password":"12345678",
+  "role":["user"]
+  }
+* 
 *Note that roles expected are only ADMIN and USER*
 
 *Expected Response*:
@@ -41,15 +49,15 @@
 
 *POST*: localhost:8080/api/auth/signin
 {
-"username":"melo",
+"username":"user",
 "password":"12345678"
 }
 
 * *Expected Response*:
 {
 "id": 1,
-"username": "melo",
-"email": "melo@gmail.com",
+"username": "user",
+"email": "user@gmail.com",
 "roles": [
 "ROLE_ADMIN"
 ],
@@ -57,22 +65,62 @@
 "tokenType": "Bearer"
 }
 
-
-3. *view page viewed by both user and admin*:
+3. *post a blog. This can be done by admin and user*:
   * add token as bearer token to be able to access the page 
-*GET* : localhost:8080/api/test/all
+*POST* : localhost:8080/api/blog/create
+  * Payload
+  * {
+    "title":"blog 5",
+    "description":"this is is the fifth blog"
+    }
+* Response
+    "title":"blog 5",
+    "description":"this is is the fifth blog"
+4. * Read a blog. also admin and user can read blogs*
+* GET : localhost:8080/api/blog/read?page=0&size=10
+* Response
+* Should return 10 blogs 
+5. * Update Blog.
+* PUT : localhost:8080/api/blog/updating/2
+* payload. ensure to pass blog id in the api.
+* {
+  "title": "Wakanda",
+  "description": "this is an african movie"
+  }
 
-Response
-Public Content.
+6. * Delete Blog ONly Admins can Delete A blog
+* DELETE : localhost:8080/api/blog/delete/1
+* delete blog by id
+* response 
+* "blog deleted Successfully"
 
+7. * Search By Title or content
+* GET : localhost:8080/api/blog/search?searchTerm=blog
+* response. should return all data with blog
+* {
+  "title":"blog 5",
+  "description":"this is is the fifth blog"
+  }
+8. * POST : add comment to a blog. We are adding by blog id. Both admins and user can add comments
+* localhost:8080/api/comment/add/2
+* payload 
+* {
+  "comment":"This was the best movie"
+  }
+9. * GET : Read comments. This Gets All comments for blog with id 2
+* localhost:8080/api/comment/get-all/2?page=0&size=10
+10. * Update comment :PUT localhost:8080/api/comment/update/4
+* Both admin and user can update a comment.
+
+11. * DELETE: delete comment. Admin can choose to delete on comment 
+* localhost:8080/api/comment/delete/2. this will delete comment with id 2
+
+* Admin can also choose to delete all comments belonging to a post
+* * localhost:8080/api/comment/delete-by-blog/2
+* This take id of a blog. so it will delete all comments for blog with id 2
 
 #### NB:
 * Remember to use bearer token.
-* Only users with admin privileges can access this route
-
-4. *Page viewed by admin only*:
-
-*PATCH*:localhost:8080/api/test/admin
 
 
 
